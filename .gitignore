@@ -1,0 +1,2 @@
+# vscode 세팅 제외
+.vscode/*.json
