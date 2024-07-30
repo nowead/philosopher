@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: damin <damin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mindaewon <mindaewon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 13:39:59 by damin             #+#    #+#             */
-/*   Updated: 2024/07/24 21:26:29 by damin            ###   ########.fr       */
+/*   Updated: 2024/07/29 16:31:29 by mindaewon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ long long	get_time(void)
 	struct timeval	time;
 
 	gettimeofday(&time, NULL);
-	return ((long long)(time.tv_sec * 1000 + time.tv_usec / 1000));
+	return ((long long)time.tv_sec * 1000 + (long long)time.tv_usec / 1000);
 }
 
 int	parse_args(t_data *data, int argc, char **argv)
@@ -34,6 +34,15 @@ int	parse_args(t_data *data, int argc, char **argv)
 	|| data->time_to_eat < 0 || data->time_to_sleep < 0 \
 	|| (argc == 6 && data->num_of_eat ==data->num_of_eat < 0))
 		return (1);
+	data->forks = malloc(sizeof(int) * data->num_of_philo);
+	if (!data->forks)
+		return (1);
+	data->fork_mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * data->num_of_philo);
+	if (!data->fork_mutex)
+	{
+		free(data->forks);
+		return (1);
+	}
 	return (0);
 }
 
@@ -41,28 +50,25 @@ int	init_philo(t_data *data, t_philo **philo)
 {
 	int	i;
 
-	**philo = (t_philo **)malloc(sizeof(t_philo) * data->num_of_philo);
-	if (!data->philo)
+	*philo = malloc(sizeof(t_philo) * data->num_of_philo);
+	if (!*philo)
 		return (1);
-	data->forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * data->num_of_philo);
-	if (!data->forks)
-	{
-		free(data->philo);
-		return (1);
-	}
+	i = 0;
+	while (i < data->num_of_philo)
+		data->forks[i++] = 0;
 	i = 0;
 	while (i < data->num_of_philo)
 	{
-		philo[i].id = i + 1;
-		philo[i].num_of_eat = 0;
-		philo[i].data = data;
-		philo[i].last_eat = get_time();
+		(*philo)[i].id = i + 1;
+		(*philo)[i].num_of_eat = 0;
+		(*philo)[i].data = data;
+		//(*philo)[i].last_eat = get_time();
 		i++;
 	}
 	if (pthread_mutex_init(&data->print_mutex, NULL) || pthread_mutex_init(&data->death_mutex, NULL))
 	{
-		free(data->philo);
-		free(data->forks);
+		free(*philo);
+		free(data->fork_mutex);
 		return (1);
 	}
 	return (0);
@@ -71,7 +77,7 @@ int	init_philo(t_data *data, t_philo **philo)
 void	print_status(t_philo *philo, char *status)
 {
 	pthread_mutex_lock(&philo->data->print_mutex);
-	ft_putnbr_fd(get_time() - philo->data->philo[0].last_eat, 1);
+	ft_putnbr_fd(get_time(), 1);
 	ft_putstr_fd(" ", 1);
 	ft_putnbr_fd(philo->id, 1);
 	ft_putstr_fd(" ", 1);
@@ -85,18 +91,23 @@ void	*philo_routine(void *ptr)
 	t_philo	*philo;
 
 	philo = (t_philo *)ptr;
+	philo->last_eat = get_time();
 	pthread_create(&philo->death_thread, NULL, &death_check, philo);
 	while (1)
 	{
-		pthread_mutex_lock(&philo->data->forks[philo->id - 1]);
-		pthread_mutex_lock(&philo->data->forks[(philo->id) % philo->data->num_of_philo]);
+		pthread_mutex_lock(&philo->data->fork_mutex[philo->id - 1]);
+		pthread_mutex_lock(&philo->data->fork_mutex[(philo->id) % philo->data->num_of_philo]);
+		philo->data->forks[philo->id - 1] = 1;
+		philo->data->forks[(philo->id) % philo->data->num_of_philo] = 1;
 		print_status(philo, "has taken a fork");
 		print_status(philo, "has taken a fork");
 		print_status(philo, "is eating");
+		philo->data->forks[philo->id - 1] = 0;
+		philo->data->forks[(philo->id) % philo->data->num_of_philo] = 0;
 		usleep(philo->data->time_to_eat);
 		philo->last_eat = get_time();
-		pthread_mutex_unlock(&philo->data->forks[philo->id - 1]);
-		pthread_mutex_unlock(&philo->data->forks[(philo->id) % philo->data->num_of_philo]);
+		pthread_mutex_unlock(&philo->data->fork_mutex[philo->id - 1]);
+		pthread_mutex_unlock(&philo->data->fork_mutex[(philo->id) % philo->data->num_of_philo]);
 		print_status(philo, "is sleeping");
 		usleep(philo->data->time_to_sleep);
 		print_status(philo, "is thinking");
@@ -123,70 +134,53 @@ void	*death_check(void *ptr)
 }
 
 
-int	start_simulation(t_data *data)
+int	free_return(t_data *data, t_philo *philo, int ret)
+{
+	free(philo);
+	free(data->fork_mutex);
+	free(data->forks);
+	return (ret);
+}
+
+int	start_simulation(t_data *data, t_philo *philo)
 {
 	int	i;
 
 	i = 0;
 	while (i < data->num_of_philo)
+		if (pthread_mutex_init(&data->fork_mutex[i++], NULL))
+			return (free_return(data, philo, 1));
+	i = 0;
+	while (i < data->num_of_philo)
 	{
-		if (pthread_mutex_init(&data->forks[i], NULL))
-		{
-			free(data->philo);
-			free(data->forks);
-			return (1);
-		}
+		if (pthread_create(&philo[i].thread, NULL, &philo_routine, &philo[i]))
+			return (free_return(data, philo, 1));
 		i++;
 	}
 	i = 0;
 	while (i < data->num_of_philo)
-	{
-		if (pthread_create(&data->philo[i].thread, NULL, &philo_routine, &data->philo[i]))
-		{
-			free(data->philo);
-			free(data->forks);
-			return (1);
-		}
-		i++;
-	}
+		if (pthread_join(philo[i++].thread, NULL))
+			return (free_return(data, philo, 1));
+	printf("dsf\n");
 	i = 0;
 	while (i < data->num_of_philo)
-	{
-		if (pthread_join(data->philo[i].thread, NULL))
-		{
-			free(data->philo);
-			free(data->forks);
-			return (1);
-		}
-		i++;
-	}
-	i = 0;
-	while (i < data->num_of_philo)
-	{
-		if (pthread_mutex_destroy(&data->forks[i]))
-		{
-			free(data->philo);
-			free(data->forks);
-			return (1);
-		}
-		i++;
-	}
-	free(data->philo);
-	free(data->forks);
-	return (0);
+		if (pthread_mutex_destroy(&data->fork_mutex[i++]))
+			return (free_return(data, philo, 1));
+	return (free_return(data, philo, 0));
 }
 
 int	main(int argc, char **argv)
 {
 	t_data	data;
+	t_philo	*philo;
 
 	if (argc < 5 || argc > 6)
-		err_return("Error: wrong number of arguments\n");
+		return (err_return("Error: wrong number of arguments\n"));
 	if (parse_args(&data, argc, argv))
-		err_return("Error: wrong arguments\n");
-	if (init_data(&data))
-		err_return("Error: init_data\n");
-	if (start_simulation(&data))
-		err_return("Error: start_simulation\n");
+		return (err_return("Error: wrong arguments\n"));
+	if (init_philo(&data, &philo))
+		return (err_return("Error: init_data\n"));
+	if (start_simulation(&data, philo))
+		return (err_return("Error: start_simulation\n"));
 	return (0);
 }

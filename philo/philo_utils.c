@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: damin <damin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mindaewon <mindaewon@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 16:37:00 by damin             #+#    #+#             */
-/*   Updated: 2024/07/22 20:26:01 by damin            ###   ########.fr       */
+/*   Updated: 2024/07/29 16:32:28 by mindaewon        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	ft_putstr_fd(char *s, int fd)
 	return (write(fd, s, ft_strlen(s)));
 }
 
-int	ft_putnbr_fd(int n, int fd)
+int	ft_putnbr_fd(long long n, int fd)
 {
 	char	c;
 	int		res;
