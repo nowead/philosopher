@@ -3,21 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mindaewon <mindaewon@student.42.fr>        +#+  +:+       +#+        */
+/*   By: damin <damin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 13:39:59 by damin             #+#    #+#             */
-/*   Updated: 2024/07/29 16:31:29 by mindaewon        ###   ########.fr       */
+/*   Updated: 2024/08/02 14:37:33 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-long long	get_time(void)
+long	get_time(void)
 {
 	struct timeval	time;
 
 	gettimeofday(&time, NULL);
-	return ((long long)time.tv_sec * 1000 + (long long)time.tv_usec / 1000);
+	return ((long)time.tv_sec * 1000 + (long)time.tv_usec / 1000);
+}
+
+void	ft_usleep(long time)
+{
+	long	start_time;
+
+	start_time = get_time();
+	while (get_time() - start_time < time)
+		usleep(10);
 }
 
 int	parse_args(t_data *data, int argc, char **argv)
@@ -77,7 +86,7 @@ int	init_philo(t_data *data, t_philo **philo)
 void	print_status(t_philo *philo, char *status)
 {
 	pthread_mutex_lock(&philo->data->print_mutex);
-	ft_putnbr_fd(get_time(), 1);
+	ft_putnbr_fd(get_time() - philo->th_start, 1);
 	ft_putstr_fd(" ", 1);
 	ft_putnbr_fd(philo->id, 1);
 	ft_putstr_fd(" ", 1);
@@ -91,25 +100,28 @@ void	*philo_routine(void *ptr)
 	t_philo	*philo;
 
 	philo = (t_philo *)ptr;
+	philo->th_start = get_time();
 	philo->last_eat = get_time();
 	pthread_create(&philo->death_thread, NULL, &death_check, philo);
 	while (1)
 	{
+		if (philo->id % 2 == 0)
+			ft_usleep(10);
 		pthread_mutex_lock(&philo->data->fork_mutex[philo->id - 1]);
-		pthread_mutex_lock(&philo->data->fork_mutex[(philo->id) % philo->data->num_of_philo]);
 		philo->data->forks[philo->id - 1] = 1;
+		print_status(philo, "has taken a fork");
+		pthread_mutex_lock(&philo->data->fork_mutex[(philo->id) % philo->data->num_of_philo]);
 		philo->data->forks[(philo->id) % philo->data->num_of_philo] = 1;
 		print_status(philo, "has taken a fork");
-		print_status(philo, "has taken a fork");
+		philo->last_eat = get_time();
 		print_status(philo, "is eating");
+		ft_usleep(philo->data->time_to_eat);
 		philo->data->forks[philo->id - 1] = 0;
 		philo->data->forks[(philo->id) % philo->data->num_of_philo] = 0;
-		usleep(philo->data->time_to_eat);
-		philo->last_eat = get_time();
 		pthread_mutex_unlock(&philo->data->fork_mutex[philo->id - 1]);
 		pthread_mutex_unlock(&philo->data->fork_mutex[(philo->id) % philo->data->num_of_philo]);
 		print_status(philo, "is sleeping");
-		usleep(philo->data->time_to_sleep);
+		ft_usleep(philo->data->time_to_sleep);
 		print_status(philo, "is thinking");
 	}
 	return (NULL);
@@ -120,14 +132,11 @@ void	*death_check(void *ptr)
 	t_philo	*philo;
 
 	philo = (t_philo *)ptr;
-	while (1)
+	while (get_time() - philo->last_eat < philo->data->time_to_die)
 	{
-		if (get_time() - philo->last_eat > philo->data->time_to_die)
-		{
 			print_status(philo, "died");
 			pthread_mutex_lock(&philo->data->death_mutex);
 			exit(1);
-		}
 	}
 	return (NULL);
 
@@ -161,7 +170,6 @@ int	start_simulation(t_data *data, t_philo *philo)
 	while (i < data->num_of_philo)
 		if (pthread_join(philo[i++].thread, NULL))
 			return (free_return(data, philo, 1));
-	printf("dsf\n");
 	i = 0;
 	while (i < data->num_of_philo)
 		if (pthread_mutex_destroy(&data->fork_mutex[i++]))
