@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 14:32:02 by damin             #+#    #+#             */
-/*   Updated: 2024/07/30 17:50:41 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/08 17:57:27 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ typedef struct s_data
 	int				time_to_sleep;
 	int				num_of_eat;
 	int				*forks;
+	int				stop_simulation;
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	death_mutex;
 	struct s_philo	*philo;
@@ -40,7 +41,7 @@ typedef struct s_philo
 	t_data			*data;
 	pthread_t		thread;
 	pthread_t		death_thread;
-	long long		last_eat;
+	long			last_eat;
 	long long		th_start;
 }					t_philo;
 
