@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: damin <damin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 13:39:59 by damin             #+#    #+#             */
-/*   Updated: 2024/08/08 18:14:45 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/09 18:11:59 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	ft_usleep(long time)
 
 	start_time = get_time();
 	while (get_time() - start_time < time)
-		usleep(10);
+		usleep(100);
 }
 
 int	parse_args(t_data *data, int argc, char **argv)
@@ -44,7 +44,7 @@ int	parse_args(t_data *data, int argc, char **argv)
 	|| data->time_to_eat < 0 || data->time_to_sleep < 0 \
 	|| (argc == 6 && data->num_of_eat ==data->num_of_eat < 0))
 		return (1);
-	data->forks = malloc(sizeof(int) * data->num_of_philo);
+	data->forks = (int *)malloc(sizeof(int) * data->num_of_philo);
 	if (!data->forks)
 		return (1);
 	data->fork_mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * data->num_of_philo);
@@ -62,7 +62,11 @@ int	init_philo(t_data *data, t_philo **philo)
 
 	*philo = malloc(sizeof(t_philo) * data->num_of_philo);
 	if (!*philo)
+	{
+		free(data->forks);
+		free(data->fork_mutex);
 		return (1);
+	}
 	i = 0;
 	while (i < data->num_of_philo)
 		data->forks[i++] = 0;
@@ -76,8 +80,7 @@ int	init_philo(t_data *data, t_philo **philo)
 	}
 	if (pthread_mutex_init(&data->print_mutex, NULL) || pthread_mutex_init(&data->death_mutex, NULL))
 	{
-		free(*philo);
-		free(data->fork_mutex);
+		free_all(data, *philo);
 		return (1);
 	}
 	return (0);
@@ -101,30 +104,26 @@ void	*philo_routine(void *ptr)
 	philo->th_start = get_time();
 	philo->last_eat = get_time();
 	pthread_create(&philo->death_thread, NULL, &death_check, philo);
-	while (!philo->data->stop_simulation)
+	if (philo->id % 2 == 0)
+		ft_usleep(10);
+	if (philo->id % 2 == 1)
 	{
-		
-		if (philo->id % 2 == 0)
-			ft_usleep(10);
 		first_fork = philo->id - 1;
 		second_fork = philo->id % philo->data->num_of_philo;
-		if (philo->id % 2 == 0) {
-			first_fork = philo->id % philo->data->num_of_philo;
-			second_fork = philo->id - 1;
-		}
-		
-		if (philo->data->stop_simulation)
-			break;
-		else
-		{
-			pthread_mutex_lock(&philo->data->fork_mutex[first_fork]);
-			philo->data->forks[first_fork] = 1;
-			print_status(philo, "has taken a fork");
-			pthread_mutex_lock(&philo->data->fork_mutex[second_fork]);
-			philo->data->forks[second_fork] = 1;
-			print_status(philo, "has taken a fork");
-		}
-		
+	}
+	else if (philo->id % 2 == 0)
+	{
+		first_fork = philo->id % philo->data->num_of_philo;
+		second_fork = philo->id - 1;
+	}
+	while (!philo->data->stop_simulation)
+	{
+		pthread_mutex_lock(&philo->data->fork_mutex[first_fork]);
+		philo->data->forks[first_fork] = 1;
+		print_status(philo, "has taken a fork");
+		pthread_mutex_lock(&philo->data->fork_mutex[second_fork]);
+		philo->data->forks[second_fork] = 1;
+		print_status(philo, "has taken a fork");
 
 		pthread_mutex_lock(&philo->data->death_mutex);		
 		philo->last_eat = get_time();
@@ -162,28 +161,23 @@ void	*death_check(void *ptr)
 			{
 				print_status(philo, "died");
 				philo->data->stop_simulation = 1;
-				pthread_mutex_unlock(&philo->data->death_mutex);
-				exit(1);
 			}
 			pthread_mutex_unlock(&philo->data->death_mutex);
 			break;
 		}
 		pthread_mutex_unlock(&philo->data->death_mutex);
-		usleep(10);
+		usleep(100);
 	}
-
-	// Ensure all other threads are notified to stop
 	philo->data->stop_simulation = 1;
 	return (NULL);
 }
 
 
-int	free_return(t_data *data, t_philo *philo, int ret)
+void	free_all(t_data data, t_philo *philo)
 {
 	free(philo);
-	free(data->fork_mutex);
-	free(data->forks);
-	return (ret);
+	free(data.fork_mutex);
+	free(data.forks);
 }
 
 int	start_simulation(t_data *data, t_philo *philo)
@@ -193,23 +187,23 @@ int	start_simulation(t_data *data, t_philo *philo)
 	i = 0;
 	while (i < data->num_of_philo)
 		if (pthread_mutex_init(&data->fork_mutex[i++], NULL))
-			return (free_return(data, philo, 1));
+			return (1);
 	i = 0;
 	while (i < data->num_of_philo)
 	{
 		if (pthread_create(&philo[i].thread, NULL, &philo_routine, &philo[i]))
-			return (free_return(data, philo, 1));
+			return (1);
 		i++;
 	}
 	i = 0;
 	while (i < data->num_of_philo)
 		if (pthread_join(philo[i++].thread, NULL))
-			return (free_return(data, philo, 1));
+			return (1);
 	i = 0;
 	while (i < data->num_of_philo)
 		if (pthread_mutex_destroy(&data->fork_mutex[i++]))
-			return (free_return(data, philo, 1));
-	return (free_return(data, philo, 0));
+			return (1);
+	return (0);
 }
 
 int	main(int argc, char **argv)
@@ -224,6 +218,9 @@ int	main(int argc, char **argv)
 	if (init_philo(&data, &philo))
 		return (err_return("Error: init_data\n"));
 	if (start_simulation(&data, philo))
+	{
+		free_all(data, philo);
 		return (err_return("Error: start_simulation\n"));
+	}
 	return (0);
 }

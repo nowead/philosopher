@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 14:32:02 by damin             #+#    #+#             */
-/*   Updated: 2024/08/08 17:57:27 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/09 16:03:25 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,6 @@ void			*philo_life(void *philo);
 void			*death_check(void *philo);
 void			print_status(t_philo *philo, char *status);
 int				ft_atoi(const char *str);
-int			ft_putnbr_fd(long long n, int fd);
-int				ft_putstr_fd(char *s, int fd);
-int				ft_putchar_fd(char c, int fd);
 int				err_return(const char *str);
 
 #endif

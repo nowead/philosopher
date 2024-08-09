@@ -3,52 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   philo_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mindaewon <mindaewon@student.42.fr>        +#+  +:+       +#+        */
+/*   By: damin <damin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 16:37:00 by damin             #+#    #+#             */
-/*   Updated: 2024/07/29 16:32:28 by mindaewon        ###   ########.fr       */
+/*   Updated: 2024/08/09 15:38:05 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-int	ft_strlen(char *s)
-{
-	int	i;
-
-	i = 0;
-	while (s[i])
-		i++;
-	return (i);
-}
-
-int	ft_putchar_fd(char c, int fd)
-{
-	return (write(fd, &c, 1));
-}
-
-int	ft_putstr_fd(char *s, int fd)
-{
-	return (write(fd, s, ft_strlen(s)));
-}
-
-int	ft_putnbr_fd(long long n, int fd)
-{
-	char	c;
-	int		res;
-
-	res = 0;
-	if (n < 0)
-	{
-		res += ft_putchar_fd('-', fd);
-		n *= -1;
-	}
-	if (n >= 10)
-		res += ft_putnbr_fd(n / 10, fd);
-	c = n % 10 + '0';
-	res += ft_putchar_fd(c, fd);
-	return (res);
-}
 
 int	ft_atoi(const char *str)
 {
