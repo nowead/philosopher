@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: damin <damin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 16:37:00 by damin             #+#    #+#             */
-/*   Updated: 2024/08/09 15:38:05 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/12 11:45:22 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,4 +41,11 @@ int	err_return(const char *str)
 {
 	printf("%s", str);
 	return (1);
+}
+
+void	free_all(t_data data, t_philo *philo)
+{
+	free(philo);
+	free(data.fork_mutex);
+	free(data.forks);
 }
