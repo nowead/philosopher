@@ -6,16 +6,16 @@
 #    By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/18 19:05:46 by damin             #+#    #+#              #
-#    Updated: 2024/08/13 16:49:10 by damin            ###   ########.fr        #
+#    Updated: 2024/08/14 19:06:55 by damin            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC			 =	cc
-CFLAGS       =	-Wall -Wextra -Werror
+CFLAGS       =	-Wall -Wextra -Werror #-g -fsanitize=thread
 
 NAME	 =	philo
 
-SRCS		 = main.c philo.c philo_utils.c simulation.c
+SRCS		 = main.c philo.c philo_utils.c simulation.c death_checker.c
 			
 OBJS 	 	 = $(SRCS:.c=.o)
 
