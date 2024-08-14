@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:49:06 by damin             #+#    #+#             */
-/*   Updated: 2024/08/13 15:54:17 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/14 14:38:07 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ int	parse_args(t_data *data, int argc, char **argv)
 	data->time_to_eat = ft_atoi(argv[3]);
 	data->time_to_sleep = ft_atoi(argv[4]);
 	data->stop_simulation = 0;
+	data->meal_end = 0;
 	if (argc == 6)
 		data->num_of_eat = ft_atoi(argv[5]);
 	else

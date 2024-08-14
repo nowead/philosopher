@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 13:39:59 by damin             #+#    #+#             */
-/*   Updated: 2024/08/13 18:35:13 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/14 15:59:22 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,21 +20,50 @@ int	check_stop_flag(t_data *data)
 	{
 		if (pthread_mutex_unlock(&data->stop_mutex))
 			return (err_return("mutex error"));
-		return (1);
+		return (2);
 	}
 	if (pthread_mutex_unlock(&data->stop_mutex))
 		return (err_return("mutex error"));
 	return (0);
 }
 
+// int	print_status(t_philo *philo, char *status)
+// {
+// 	if (pthread_mutex_lock(&philo->data->print_mutex))
+// 		return (1);
+// 	if (!check_stop_flag(philo->data))
+// 	{
+// 		if (printf("%ld %d %s\n",\
+// 		get_time() - (long)philo->data->th_start, philo->id, status) == -1)
+// 			return (err_return("print error"));
+// 	}
+// 	if (pthread_mutex_unlock(&philo->data->print_mutex))
+// 		return (1);
+// 	return (0);
+// }
+
 int	print_status(t_philo *philo, char *status)
 {
+	int		stop_flag;
+	long	curr_time;
+
 	if (pthread_mutex_lock(&philo->data->print_mutex))
 		return (1);
-	if (!check_stop_flag(philo->data))
+	stop_flag = check_stop_flag(philo->data);
+	curr_time = get_time();
+	if (curr_time == -1)
+		return (1);
+	if (stop_flag == 0)
+	{
 		if (printf("%ld %d %s\n",\
-		get_time() - (long)philo->data->th_start, philo->id, status) == -1)
+		curr_time - (long)philo->data->th_start, philo->id, status) == -1)
 			return (err_return("print error"));
+	}
+	else if (stop_flag == 1)
+	{
+		pthread_mutex_unlock(&philo->data->print_mutex);
+		return (1);	
+	}
 	if (pthread_mutex_unlock(&philo->data->print_mutex))
 		return (1);
 	return (0);
