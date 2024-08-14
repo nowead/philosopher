@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 14:32:02 by damin             #+#    #+#             */
-/*   Updated: 2024/08/14 19:13:29 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/14 19:29:01 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int				mutex_destroy(t_data *data);
 int				start_simulation(t_data *data, t_philo *philo);
 
 //death_checker.c
-void			death_checker(t_data *data, t_philo *philo);
+int				death_checker(t_data *data, t_philo *philo);
 
 //philo_utils.c
 int				ft_atoi(const char *str);

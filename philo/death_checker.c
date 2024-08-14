@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:22:08 by damin             #+#    #+#             */
-/*   Updated: 2024/08/14 18:57:09 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/14 19:31:28 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,19 @@ int	death_handle(t_data *data, t_philo *philo, long curr_time, int i)
 
 	ret = 0;
 	if (!ret && pthread_mutex_lock(&data->stop_mutex))
-			ret = 1;
+			ret = err_return("Error: mutex lock failed");
 	if (!ret)
 		philo->data->stop_simulation = 1;
 	if (!ret && pthread_mutex_unlock(&data->stop_mutex))
-		ret = 1;
+		ret = err_return("Error: mutex unlock failed");
 	if (pthread_mutex_lock(&philo->data->print_mutex))
-		ret = 1;
+		ret = err_return("Error: mutex lock failed");
 	if (!ret && printf("%ld %d %s\n", curr_time - \
 	(long)philo[i].data->th_start \
 	, philo[i].id, "died") == -1)
-				ret = 1;
+		ret = err_return("Error: printf failed");
 	if (pthread_mutex_unlock(&philo->data->print_mutex))
-		ret = 1;
+		ret = err_return("Error: mutex unlock failed");
 	if (ret)
 		return (1);
 	return (0);
@@ -43,22 +43,22 @@ int	death_process(t_data *data, t_philo *philo, int i)
 
 	ret = 0;
 	if (pthread_mutex_lock(&data->death_mutex))
-		ret = 1;
+		ret = err_return("Error: mutex lock failed");
 	curr_time = get_time();
 	if (!ret && (curr_time - philo[i].last_eat > data->time_to_die))
 		ret = death_handle(data, philo, curr_time, i);
 	if (pthread_mutex_unlock(&data->death_mutex))
-		ret = 1;
+		ret = err_return("Error: mutex unlock failed");
 	if (curr_time == -1)
 		ret = 1;
 	if (!ret && usleep(100))
-		ret = 1;
+		ret = err_return("Error: usleep failed");
 	if (ret)
 		return (1);
 	return (0);
 }
 
-void	death_checker(t_data *data, t_philo	*philo)
+int	death_checker(t_data *data, t_philo	*philo)
 {
 	int		i;
 	int		ret;
@@ -84,4 +84,5 @@ void	death_checker(t_data *data, t_philo	*philo)
 		if (i == data->num_of_philo)
 			data->meal_end = 1;
 	}
+	return (ret);
 }

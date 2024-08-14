@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:49:06 by damin             #+#    #+#             */
-/*   Updated: 2024/08/14 19:04:27 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/14 19:23:03 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,14 @@ int	parse_args(t_data *data, int argc, char **argv)
 	|| data->time_to_eat < 0 || data->time_to_sleep < 0 \
 	|| (argc == 6 && data->num_of_eat == data->num_of_eat < 0))
 		return (1);
-	data->forks = (int *)malloc(sizeof(int) * data->num_of_philo);
+	data->forks = malloc(sizeof(int) * data->num_of_philo);
 	if (!data->forks)
-		return (1);
+		return (err_return("Error: malloc failed"));
 	data->fork_mutex = malloc(sizeof(pthread_mutex_t) * data->num_of_philo);
 	if (!data->fork_mutex)
 	{
 		free(data->forks);
-		return (1);
+		return (err_return("Error: malloc failed"));
 	}
 	return (0);
 }
@@ -49,12 +49,12 @@ int	mutex_init(t_data *data, t_philo **philo)
 	|| pthread_mutex_init(&data->stop_mutex, NULL))
 	{
 		free_all(*data, *philo);
-		return (1);
+		return (err_return("Error: mutex init"));
 	}
 	i = 0;
 	while (i < data->num_of_philo)
 		if (pthread_mutex_init(&data->fork_mutex[i++], NULL))
-			return (1);
+			return (err_return("Error: mutex init"));
 	return (0);
 }
 
@@ -67,7 +67,7 @@ int	init_philo(t_data *data, t_philo **philo)
 	{
 		free(data->forks);
 		free(data->fork_mutex);
-		return (1);
+		return (err_return("Error: malloc failed"));
 	}
 	i = 0;
 	while (i < data->num_of_philo)
@@ -81,7 +81,7 @@ int	init_philo(t_data *data, t_philo **philo)
 		i++;
 	}
 	if (mutex_init(data, philo))
-		return (1);
+		return (err_return("Error: mutex init"));
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:48:56 by damin             #+#    #+#             */
-/*   Updated: 2024/08/14 18:56:48 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/14 19:28:09 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,37 +64,39 @@ int	mutex_destroy(t_data *data)
 	i = 0;
 	while (i < data->num_of_philo)
 		if (pthread_mutex_destroy(&data->fork_mutex[i++]))
-			return (1);
+			return (err_return("Error: mutex destroy failed"));
 	if (pthread_mutex_destroy(&data->print_mutex) || \
 	pthread_mutex_destroy(&data->death_mutex) \
 	|| pthread_mutex_destroy(&data->stop_mutex))
-		return (1);
+		return (err_return("Error: mutex destroy failed"));
 	return (0);
 }
 
 int	start_simulation(t_data *data, t_philo *philo)
 {
 	int	i;
+	int	ret;
 
+	ret = 0;
 	data->th_start = get_time();
 	i = 0;
 	while (i < data->num_of_philo)
 	{
 		if (pthread_create(&philo[i].thread, NULL, &philo_routine, &philo[i]))
-			return (1);
+			return (err_return("Error: pthread create failed"));
 		if (pthread_mutex_lock(&data->death_mutex))
-			return (err_return("mutex error"));
+			return (err_return("Error: mutex lock failed"));
 		philo[i].last_eat = get_time();
 		if (pthread_mutex_unlock(&data->death_mutex))
-			return (err_return("mutex error"));
+			return (err_return("Error: mutex unlock failed"));
 		i++;
 	}
-	death_checker(data, philo);
+	ret = death_checker(data, philo);
 	i = 0;
 	while (i < data->num_of_philo)
 		if (pthread_join(philo[i++].thread, NULL))
-			return (1);
+			return (err_return("Error: pthread join failed"));
 	if (mutex_destroy(data))
 		return (1);
-	return (0);
+	return (ret);
 }
