@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:48:56 by damin             #+#    #+#             */
-/*   Updated: 2024/08/14 19:28:09 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/15 13:41:02 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ void	*philo_routine(void *ptr)
 			break ;
 		if (print_status(philo, "is thinking"))
 			break ;
+		usleep(100);
 	}
 	return (NULL);
 }
