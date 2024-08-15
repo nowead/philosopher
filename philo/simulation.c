@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:48:56 by damin             #+#    #+#             */
-/*   Updated: 2024/08/15 13:41:02 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/15 19:54:33 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,27 @@
 
 int	philo_eat(t_philo *philo, int first_fork, int second_fork)
 {
-	if (pick_fork(philo, first_fork) || pick_fork(philo, second_fork))
+	int	ret;
+
+	ret = 0;
+	if (pick_fork(philo, first_fork))
 		return (1);
+	if (pick_fork(philo, second_fork))
+	{
+		drop_fork(philo, first_fork);
+		return (1);
+	}
 	if (pthread_mutex_lock(&philo->data->death_mutex))
-		return (err_return("mutex error"));
+		ret = (err_return("mutex error"));
 	if (print_status(philo, "is eating"))
-		return (1);
+		ret = 1;
 	philo->last_eat = get_time();
+	if (philo->last_eat == -1)
+		ret = 1;
 	philo->num_of_eat++;
 	if (pthread_mutex_unlock(&philo->data->death_mutex))
-		return (err_return("mutex error"));
-	if (ft_usleep(philo->data->time_to_eat))
+		ret = err_return("mutex error");
+	if (!ret && ft_usleep(philo->data->time_to_eat))
 		return (1);
 	if (drop_fork(philo, first_fork) || drop_fork(philo, second_fork))
 		return (1);
@@ -53,7 +63,8 @@ void	*philo_routine(void *ptr)
 			break ;
 		if (print_status(philo, "is thinking"))
 			break ;
-		usleep(100);
+		if (usleep(100))
+			break ;
 	}
 	return (NULL);
 }
@@ -73,30 +84,44 @@ int	mutex_destroy(t_data *data)
 	return (0);
 }
 
+int	repeat_part(t_data *data, t_philo *philo, int i)
+{
+	if (pthread_create(&philo[i].thread, NULL, &philo_routine, &philo[i]))
+		return (err_return("Error: pthread create failed"));
+	if (pthread_mutex_lock(&data->death_mutex))
+		return (err_return("Error: mutex lock failed"));
+	philo[i].last_eat = get_time();
+	if (philo[i].last_eat == -1)
+		return (1);
+	if (pthread_mutex_unlock(&data->death_mutex))
+		return (err_return("Error: mutex unlock failed"));
+	return (0);
+}
+
 int	start_simulation(t_data *data, t_philo *philo)
 {
 	int	i;
 	int	ret;
+	int	err_i;
 
 	ret = 0;
 	data->th_start = get_time();
-	i = 0;
-	while (i < data->num_of_philo)
+	if (data->th_start == -1)
 	{
-		if (pthread_create(&philo[i].thread, NULL, &philo_routine, &philo[i]))
-			return (err_return("Error: pthread create failed"));
-		if (pthread_mutex_lock(&data->death_mutex))
-			return (err_return("Error: mutex lock failed"));
-		philo[i].last_eat = get_time();
-		if (pthread_mutex_unlock(&data->death_mutex))
-			return (err_return("Error: mutex unlock failed"));
-		i++;
+		mutex_destroy(data);
+		return (1);
 	}
+	i = -1;
+	while (!ret && ++i < data->num_of_philo)
+	{
+		ret = repeat_part(data, philo, i);
+	}
+	err_i = i;
 	ret = death_checker(data, philo);
 	i = 0;
-	while (i < data->num_of_philo)
+	while (i < err_i)
 		if (pthread_join(philo[i++].thread, NULL))
-			return (err_return("Error: pthread join failed"));
+			ret = err_return("Error: pthread join failed");
 	if (mutex_destroy(data))
 		return (1);
 	return (ret);

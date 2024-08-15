@@ -6,100 +6,88 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:49:06 by damin             #+#    #+#             */
-/*   Updated: 2024/08/14 19:42:05 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/15 17:42:10 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
 
-int	parse_args(t_data *data, int argc, char **argv)
+int	parse_args(t_philo *philo, int argc, char **argv)
 {
-	data->num_of_philo = ft_atoi(argv[1]);
-	data->time_to_die = ft_atoi(argv[2]);
-	data->time_to_eat = ft_atoi(argv[3]);
-	data->time_to_sleep = ft_atoi(argv[4]);
-	data->stop_simulation = 0;
-	data->meal_end = 0;
+	philo->num_of_philo = ft_atoi(argv[1]);
+	philo->time_to_die = ft_atoi(argv[2]);
+	philo->time_to_eat = ft_atoi(argv[3]);
+	philo->time_to_sleep = ft_atoi(argv[4]);
 	if (argc == 6)
-		data->num_of_eat = ft_atoi(argv[5]);
+		philo->num_of_eat = ft_atoi(argv[5]);
 	else
-		data->num_of_eat = -1;
-	if (data->num_of_philo < 2 || data->time_to_die < 0 \
-	|| data->time_to_eat < 0 || data->time_to_sleep < 0 \
-	|| (argc == 6 && data->num_of_eat == data->num_of_eat < 0))
+		philo->num_of_eat = -1;
+	if (philo->num_of_philo < 2 || philo->time_to_die < 0 \
+	|| philo->time_to_eat < 0 || philo->time_to_sleep < 0 \
+	|| (argc == 6 && philo->num_of_eat < 0))
 		return (1);
-	data->forks = malloc(sizeof(int) * data->num_of_philo);
-	if (!data->forks)
-		return (err_return("Error: malloc failed"));
-	data->fork_mutex = malloc(sizeof(pthread_mutex_t) * data->num_of_philo);
-	if (!data->fork_mutex)
+	return (0);
+}
+
+void	sem_clear(t_philo *philo)
+{
+	sem_close(philo->fork);
+	sem_close(philo->print);
+	sem_close(philo->die);
+}
+
+int	init_sem(t_philo *philo)
+{
+	if (sem_unlink("sem_fork") || sem_unlink("sem_print") || \
+	sem_unlink("sem_die"))
+		return (err_return("Error: sem_unlink failed"));
+	philo->fork = sem_open("sem_fork", O_CREAT, 0644, philo->num_of_philo);
+	if (philo->fork == SEM_FAILED)
+		return (err_return("Error: sem_open failed"));
+	philo->print = sem_open("sem_print", O_CREAT, 0644);
+	if (philo->print == SEM_FAILED)
 	{
-		free(data->forks);
-		return (err_return("Error: malloc failed"));
+		sem_close(philo->fork);
+		return (err_return("Error: sem_open failed"));
+	}
+	philo->die = sem_open("sem_die", O_CREAT, 0644);
+	if (philo->die == SEM_FAILED)
+	{
+		sem_close(philo->fork);
+		sem_close(philo->print);
+		return (err_return("Error: sem_open failed"));
 	}
 	return (0);
 }
 
-int	mutex_init(t_data *data, t_philo **philo)
+int	init_philo(t_philo *philo)
 {
 	int	i;
 
-	if (pthread_mutex_init(&data->print_mutex, NULL) \
-	|| pthread_mutex_init(&data->death_mutex, NULL) \
-	|| pthread_mutex_init(&data->stop_mutex, NULL))
-	{
-		free_all(*data, *philo);
-		return (err_return("Error: mutex init"));
-	}
-	i = 0;
-	while (i < data->num_of_philo)
-		if (pthread_mutex_init(&data->fork_mutex[i++], NULL))
-			return (err_return("Error: mutex init"));
-	return (0);
-}
-
-int	init_philo(t_data *data, t_philo **philo)
-{
-	int	i;
-
-	*philo = malloc(sizeof(t_philo) * data->num_of_philo);
-	if (!*philo)
-	{
-		free(data->forks);
-		free(data->fork_mutex);
-		return (err_return("Error: malloc failed"));
-	}
-	i = 0;
-	while (i < data->num_of_philo)
-		data->forks[i++] = 0;
-	i = 0;
-	while (i < data->num_of_philo)
-	{
-		(*philo)[i].id = i + 1;
-		(*philo)[i].num_of_eat = 0;
-		(*philo)[i].data = data;
-		i++;
-	}
-	if (mutex_init(data, philo))
-		return (err_return("Error: mutex init"));
+	philo->id = 0;
+	philo->meal_cnt = 0;
+	philo->start_time = 0;
+	philo->last_eat = 0;
+	if (init_sem)
+		return (1);
 	return (0);
 }
 
 int	main(int argc, char **argv)
 {
-	t_data	data;
-	t_philo	*philo;
+	t_philo	philo;
 
 	if (argc < 5 || argc > 6)
-		return (err_return("Error: wrong number of arguments\n"));
-	if (parse_args(&data, argc, argv))
-		return (err_return("Error: wrong arguments\n"));
-	if (init_philo(&data, &philo))
+		return (err_return("Error: wrong number of arguments"));
+	if (parse_args(&philo, argc, argv))
+		return (err_return("Error: wrong arguments"));
+	if (init_philo(&philo))
 		return (err_return("Error: init_data\n"));
-	if (start_simulation(&data, philo))
+	if (start_simulation(&philo))
 	{
-		free_all(data, philo);
-		return (err_return("Error: start_simulation\n"));
+		sem_clear(&philo);
+		return (err_return("Error: start_simulation"));
 	}
+	sem_clear(&philo);
 	return (0);
 }

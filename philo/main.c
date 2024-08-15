@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:49:06 by damin             #+#    #+#             */
-/*   Updated: 2024/08/14 19:23:03 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/15 15:01:40 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int	parse_args(t_data *data, int argc, char **argv)
 		data->num_of_eat = -1;
 	if (data->num_of_philo < 2 || data->time_to_die < 0 \
 	|| data->time_to_eat < 0 || data->time_to_sleep < 0 \
-	|| (argc == 6 && data->num_of_eat == data->num_of_eat < 0))
+	|| (argc == 6 && data->num_of_eat < 0))
 		return (1);
 	data->forks = malloc(sizeof(int) * data->num_of_philo);
 	if (!data->forks)

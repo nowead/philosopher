@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 14:32:02 by damin             #+#    #+#             */
-/*   Updated: 2024/08/14 20:38:18 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/15 15:39:55 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,6 @@ typedef struct s_philo
 	long			last_eat;
 }					t_philo;
 
-void			*philo_life(void *philo);
-
 //main.c
 int				parse_args(t_data *data, int argc, char **argv);
 int				init_philo(t_data *data, t_philo **philo);
@@ -64,6 +62,7 @@ int *first_fork, int *second_fork);
 int				philo_eat(t_philo *philo, int first_fork, int second_fork);
 void			*philo_routine(void *ptr);
 int				mutex_destroy(t_data *data);
+int				repeat_part(t_data *data, t_philo *philo, int i);
 int				start_simulation(t_data *data, t_philo *philo);
 
 //death_checker.c

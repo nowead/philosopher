@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 13:39:59 by damin             #+#    #+#             */
-/*   Updated: 2024/08/14 19:41:56 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/15 19:05:50 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,21 +29,16 @@ int	check_stop_flag(t_data *data)
 
 int	print_status(t_philo *philo, char *status)
 {
-	int		stop_flag;
 	long	curr_time;
 
-	if (pthread_mutex_lock(&philo->data->print_mutex))
-		return (1);
-	stop_flag = check_stop_flag(philo->data);
+	if (sem_wait(philo->print))
+		return (err_return("Error: sem_wait failed"));
 	curr_time = get_time();
 	if (curr_time == -1)
 		return (1);
-	if (stop_flag == 0)
-	{
-		if (printf("%ld %d %s\n", \
-		curr_time - (long)philo->data->th_start, philo->id, status) == -1)
-			return (err_return("print error"));
-	}
+	if (printf("%ld %d %s\n", \
+	curr_time - (long)philo->start_time, philo->id, status) == -1)
+		return (err_return("print error"));
 	else if (stop_flag == 1)
 	{
 		pthread_mutex_unlock(&philo->data->print_mutex);

@@ -6,7 +6,7 @@
 #    By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/18 19:05:46 by damin             #+#    #+#              #
-#    Updated: 2024/08/14 19:35:45 by damin            ###   ########.fr        #
+#    Updated: 2024/08/15 14:20:02 by damin            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,4 +44,4 @@ re:
 	make fclean
 	make all
 
-.PHONY: all clean bonus fclean re 
+.PHONY: all clean fclean re 
