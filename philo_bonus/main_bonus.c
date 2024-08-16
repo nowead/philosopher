@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:49:06 by damin             #+#    #+#             */
-/*   Updated: 2024/08/16 13:56:13 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/16 18:53:25 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,19 +38,19 @@ void	sem_clear(t_philo *philo)
 
 int	init_sem(t_philo *philo)
 {
-	if (sem_unlink("sem_fork") || sem_unlink("sem_print") || \
-	sem_unlink("sem_die"))
-		return (err_return("Error: sem_unlink failed"));
+	sem_unlink("sem_fork");
+	sem_unlink("sem_print");
+	sem_unlink("sem_die");
 	philo->fork = sem_open("sem_fork", O_CREAT, 0644, philo->num_of_philo);
 	if (philo->fork == SEM_FAILED)
 		return (err_return("Error: sem_open failed"));
-	philo->print = sem_open("sem_print", O_CREAT, 0644);
+	philo->print = sem_open("sem_print", O_CREAT, 0644, 1);
 	if (philo->print == SEM_FAILED)
 	{
 		sem_close(philo->fork);
 		return (err_return("Error: sem_open failed"));
 	}
-	philo->die = sem_open("sem_die", O_CREAT, 0644);
+	philo->die = sem_open("sem_die", O_CREAT, 0644, 1);
 	if (philo->die == SEM_FAILED)
 	{
 		sem_close(philo->fork);
@@ -78,7 +78,7 @@ int	main(int argc, char **argv)
 	if (parse_args(&philo, argc, argv))
 		return (err_return("Error: wrong arguments"));
 	if (init_philo(&philo))
-		return (err_return("Error: init_data\n"));
+		return (err_return("Error: init_data"));
 	if (start_simulation(&philo))
 	{
 		sem_clear(&philo);

@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:48:56 by damin             #+#    #+#             */
-/*   Updated: 2024/08/16 14:02:38 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/16 20:57:33 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,12 @@ int	death_handle(t_philo *philo, long curr_time)
 
 	ret = 0;
 	if (sem_wait(philo->print))
-		ret = err_return("Error: mutex lock failed");
+		ret = err_return("Error: sem_wait failed");
 	if (!ret && printf("%ld %d %s\n", curr_time - \
 	(long)philo->start_time, philo->id, "died") == -1)
 		ret = err_return("Error: printf failed");
 	if (sem_post(philo->print))
-		ret = err_return("Error: mutex unlock failed");
+		ret = err_return("Error: sem_post failed");
 	if (ret)
 		return (1);
 	return (0);
@@ -40,7 +40,7 @@ void	*death_check(void *ptr)
 	while (!ret)
 	{
 		if (sem_wait(philo->die))
-			err_exit("Error: sem_wait failed");
+			err_exit("Error: sem_wait OOO failed");
 		curr_time = get_time();
 		if (curr_time - philo->last_eat > philo->time_to_die)
 			ret = death_handle(philo, curr_time);
@@ -53,6 +53,8 @@ void	*death_check(void *ptr)
 	}
 	return (NULL);
 }
+
+
 
 int	child_process(t_philo *philo)
 {
@@ -79,7 +81,7 @@ int	child_process(t_philo *philo)
 			ret = 1;
 		if (sem_wait(philo->die))
 			ret = err_return("Error: sem_wait failed");
-		if (print_status(philo, "has taken a fork"))
+		if (print_status(philo, "is eating"))
 			ret = 1;
 		philo->last_eat = get_time();
 		if (philo->last_eat == -1)
@@ -94,7 +96,6 @@ int	child_process(t_philo *philo)
 			ret = err_return("Erro: sem_post failed");
 		if (sem_post(philo->fork))
 			err_exit("Erro: sem_post failed");
-		return (ret);
 		if (philo->meal_cnt == philo->num_of_eat)
 			break ;
 		if (print_status(philo, "is sleeping"))
@@ -128,8 +129,7 @@ int	parents_process(t_philo *philo, pid_t *pids)
 			i = 0;
 			while (i < philo->num_of_philo)
 			{
-				if (kill(pids[i], SIGKILL))
-					ret = err_return("Error: kill failed");
+				kill(pids[i], SIGKILL);
 				i++;
 			}
 		}
@@ -149,6 +149,7 @@ int	start_simulation(t_philo *philo)
 	pids = (pid_t *)malloc(philo->num_of_philo * sizeof(pid_t));
 	if (!pids)
 		return (err_return ("Error: malloc failed"));
+	memset(pids, 0, philo->num_of_philo * sizeof(pid_t));
 	philo->start_time = get_time();
 	if (philo->start_time == -1)
 		ret = 1;
@@ -157,16 +158,19 @@ int	start_simulation(t_philo *philo)
 	{
 		pids[i] = fork();
 		if (pids[i] == -1)
+		{
 			ret = err_return ("Error: fork failed");
+			break ;
+		}
 		if (pids[i] == 0)
 		{
-			philo->id = i;
+			philo->id = i + 1;
 			break ;
 		}
 	}
 	err_i = i;
 	i = 0;
-	if (err_i != philo->num_of_philo)
+	if (pids[philo->id - 1] != 0 && err_i != philo->num_of_philo)
 	{
 		while (i < err_i)
 		{
@@ -176,7 +180,7 @@ int	start_simulation(t_philo *philo)
 		}
 		exit (1);
 	}
-	if (!ret && pids[philo->id] == 0 && !child_process(philo))
+	if (!ret && pids[philo->id] == 0 && child_process(philo))
 		ret = 1;
 	else
 		ret = parents_process(philo, pids);

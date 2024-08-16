@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:48:56 by damin             #+#    #+#             */
-/*   Updated: 2024/08/15 19:54:33 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/16 16:35:34 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ int	philo_eat(t_philo *philo, int first_fork, int second_fork)
 		drop_fork(philo, first_fork);
 		return (1);
 	}
-	if (pthread_mutex_lock(&philo->data->death_mutex))
-		ret = (err_return("mutex error"));
 	if (print_status(philo, "is eating"))
 		ret = 1;
+	if (pthread_mutex_lock(&philo->data->death_mutex))
+		ret = (err_return("mutex error"));
 	philo->last_eat = get_time();
 	if (philo->last_eat == -1)
 		ret = 1;

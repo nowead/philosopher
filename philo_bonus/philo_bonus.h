@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 14:32:02 by damin             #+#    #+#             */
-/*   Updated: 2024/08/16 14:02:14 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/16 19:23:56 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <sys/time.h>
+# include <string.h>
+# include <err.h> // 지워야함
 
 typedef struct s_philo
 {
@@ -38,13 +40,13 @@ typedef struct s_philo
 	pthread_t	death_checker;
 }					t_philo;
 
-// main.c
+// main_bonus.c
 int		parse_args(t_philo *philo, int argc, char **argv);
 void	sem_clear(t_philo *philo);
 int		init_sem(t_philo *philo);
 int		init_philo(t_philo *philo);
 
-// philo.c
+// philo_bonus.c
 int		print_status(t_philo *philo, char *status);
 
 // simulation_bonus.c
