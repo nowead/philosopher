@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:49:06 by damin             #+#    #+#             */
-/*   Updated: 2024/08/15 17:42:10 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/16 13:56:13 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,15 +62,11 @@ int	init_sem(t_philo *philo)
 
 int	init_philo(t_philo *philo)
 {
-	int	i;
-
 	philo->id = 0;
 	philo->meal_cnt = 0;
 	philo->start_time = 0;
 	philo->last_eat = 0;
-	if (init_sem)
-		return (1);
-	return (0);
+	return (init_sem(philo));
 }
 
 int	main(int argc, char **argv)

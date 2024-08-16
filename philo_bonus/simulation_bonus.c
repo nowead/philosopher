@@ -6,17 +6,61 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:48:56 by damin             #+#    #+#             */
-/*   Updated: 2024/08/15 20:59:29 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/16 14:02:38 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
+
+int	death_handle(t_philo *philo, long curr_time)
+{
+	int	ret;
+
+	ret = 0;
+	if (sem_wait(philo->print))
+		ret = err_return("Error: mutex lock failed");
+	if (!ret && printf("%ld %d %s\n", curr_time - \
+	(long)philo->start_time, philo->id, "died") == -1)
+		ret = err_return("Error: printf failed");
+	if (sem_post(philo->print))
+		ret = err_return("Error: mutex unlock failed");
+	if (ret)
+		return (1);
+	return (0);
+}
+
+void	*death_check(void *ptr)
+{
+	int		ret;
+	t_philo	*philo;
+	long	curr_time;
+
+	ret = 0;
+	philo = (t_philo *)ptr;
+	while (!ret)
+	{
+		if (sem_wait(philo->die))
+			err_exit("Error: sem_wait failed");
+		curr_time = get_time();
+		if (curr_time - philo->last_eat > philo->time_to_die)
+			ret = death_handle(philo, curr_time);
+		if (sem_post(philo->die))
+			err_exit("Error: sem_post failed");
+		if (curr_time == -1)
+			exit(1);
+		if (!ret && usleep(100))
+			err_exit("Error: usleep failed");
+	}
+	return (NULL);
+}
 
 int	child_process(t_philo *philo)
 {
 	int	ret;
 
 	ret = 0;
+	if (pthread_create(&philo->death_checker, NULL, &death_check, &philo))
+		err_exit("Error: pthread_create failed");
 	while (1)
 	{
 		if (sem_wait(philo->fork))
@@ -49,10 +93,10 @@ int	child_process(t_philo *philo)
 		if (sem_post(philo->fork))
 			ret = err_return("Erro: sem_post failed");
 		if (sem_post(philo->fork))
-			return (err_return("Erro: sem_post failed"));
+			err_exit("Erro: sem_post failed");
 		return (ret);
 		if (philo->meal_cnt == philo->num_of_eat)
-			exit(0);
+			break ;
 		if (print_status(philo, "is sleeping"))
 			exit(1);
 		if (ft_usleep(philo->time_to_sleep))
@@ -62,6 +106,9 @@ int	child_process(t_philo *philo)
 		if (usleep(100))
 			exit(1);
 	}
+	if (pthread_join(philo->death_checker, NULL))
+		err_exit("Error: pthread join failed");
+	exit (0);
 }
 
 int	parents_process(t_philo *philo, pid_t *pids)

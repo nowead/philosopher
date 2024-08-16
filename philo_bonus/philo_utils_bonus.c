@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 16:37:00 by damin             #+#    #+#             */
-/*   Updated: 2024/08/15 14:37:49 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/16 14:06:02 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,9 +74,8 @@ int	err_return(const char *str)
 	return (1);
 }
 
-void	free_all(t_data data, t_philo *philo)
+void	err_exit(const char *str)
 {
-	free(philo);
-	free(data.fork_mutex);
-	free(data.forks);
+	printf("%s\n", str);
+	exit (1);
 }

@@ -6,7 +6,7 @@
 #    By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 19:37:55 by damin             #+#    #+#              #
-#    Updated: 2024/08/15 14:19:53 by damin            ###   ########.fr        #
+#    Updated: 2024/08/16 14:03:09 by damin            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,8 +15,8 @@ CFLAGS       =	-Wall -Wextra -Werror #-g -fsanitize=thread
 
 NAME	 =	philo_bonus
 
-SRCS		 = main.c philo_bonus.c philo_utils_bonus.c simulation_bonus.c \
-			   death_checker_bonus.c
+SRCS		 = main_bonus.c philo_bonus.c philo_utils_bonus.c simulation_bonus.c #\
+			   #death_checker_bonus.c
 			
 OBJS 	 	 = $(SRCS:.c=.o)
 
