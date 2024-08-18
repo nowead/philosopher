@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:48:56 by damin             #+#    #+#             */
-/*   Updated: 2024/08/16 20:57:33 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/18 14:46:53 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int	child_process(t_philo *philo)
 	int	ret;
 
 	ret = 0;
-	if (pthread_create(&philo->death_checker, NULL, &death_check, &philo))
+	if (pthread_create(&philo->death_checker, NULL, &death_check, philo))
 		err_exit("Error: pthread_create failed");
 	while (1)
 	{

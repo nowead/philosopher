@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:48:56 by damin             #+#    #+#             */
-/*   Updated: 2024/08/16 16:35:34 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/18 15:35:44 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,6 @@ void	*philo_routine(void *ptr)
 		if (ft_usleep(philo->data->time_to_sleep))
 			break ;
 		if (print_status(philo, "is thinking"))
-			break ;
-		if (usleep(100))
 			break ;
 	}
 	return (NULL);

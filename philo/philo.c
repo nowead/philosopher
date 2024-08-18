@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 13:39:59 by damin             #+#    #+#             */
-/*   Updated: 2024/08/14 19:13:04 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/18 15:36:02 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,14 +74,6 @@ int	drop_fork(t_philo *philo, int fork)
 
 void	optimize_fork(t_philo *philo, int *first_fork, int *second_fork)
 {
-	if (philo->id % 2 == 1)
-	{
-		*first_fork = philo->id - 1;
-		*second_fork = philo->id % philo->data->num_of_philo;
-	}
-	else if (philo->id % 2 == 0)
-	{
-		*first_fork = philo->id % philo->data->num_of_philo;
-		*second_fork = philo->id - 1;
-	}
+	*first_fork = philo->id - 1;
+	*second_fork = philo->id % philo->data->num_of_philo;
 }
