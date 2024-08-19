@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 13:39:59 by damin             #+#    #+#             */
-/*   Updated: 2024/08/19 15:52:40 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/19 21:58:25 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ int	print_status(t_philo *philo, char *status)
 		return (err_return("Error: sem_post failed"));
 	return (0);
 }
+
 void	pick_fork(t_philo *philo, int *ret)
 {
 	if (sem_wait(philo->fork))

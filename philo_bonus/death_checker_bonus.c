@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/19 14:52:53 by damin             #+#    #+#             */
-/*   Updated: 2024/08/19 15:54:14 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/19 21:57:19 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,21 +20,23 @@ void	death_handle(t_philo *philo, long curr_time)
 	(long)philo->start_time \
 	, philo->id, "died") == -1)
 		err_return("Error: printf failed");
-	exit(1);		
+	if (sem_post(philo->print))
+		err_return("Error: sem_wait failed");
+	exit(1);
 }
 
 void	*death_check(void *ptr)
 {
-	t_philo *philo;
+	t_philo	*philo;
 	long	curr_time;
-	
+
 	philo = (t_philo *)ptr;
 	while (1)
 	{
 		curr_time = get_time();
 		if (sem_wait(philo->die))
 			err_exit("Error: sem_wait failed");
-		if (curr_time - philo->last_eat > philo->time_to_die)
+		if ((curr_time - philo->last_eat) > philo->time_to_die)
 			death_handle(philo, curr_time);
 		if (sem_post(philo->die))
 			err_exit("Error: sem_post failed");
@@ -47,4 +49,3 @@ void	*death_check(void *ptr)
 	}
 	return (NULL);
 }
-

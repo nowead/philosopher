@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 14:32:02 by damin             #+#    #+#             */
-/*   Updated: 2024/08/19 15:44:31 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/19 22:13:35 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,13 @@
 
 # include <semaphore.h>
 # include <pthread.h>
-# include <signal.h>
 # include <stdio.h>
+# include <signal.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <sys/time.h>
 # include <string.h>
-# include <err.h> // 지워야함
+# include <sys/wait.h>
 
 typedef struct s_philo
 {
@@ -46,9 +46,9 @@ void	*death_check(void *ptr);
 
 // main_bonus.c
 int		parse_args(t_philo *philo, int argc, char **argv);
-void	sem_clear(t_philo *philo);
+void	clear_philo(t_philo *philo);
 int		init_sem(t_philo *philo);
-int		init_philo(t_philo *philo);
+t_philo	*init_philo(int argc, char **argv);
 
 // philo_bonus.c
 int		print_status(t_philo *philo, char *status);

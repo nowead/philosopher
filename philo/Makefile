@@ -6,12 +6,13 @@
 #    By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/18 19:05:46 by damin             #+#    #+#              #
-#    Updated: 2024/08/16 14:02:59 by damin            ###   ########.fr        #
+#    Updated: 2024/08/19 22:14:47 by damin            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC			 =	cc
-CFLAGS       =	-Wall -Wextra -Werror #-g -fsanitize=thread
+CFLAGS       =	-Wall -Wextra -Werror
+#-g -fsanitize=thread
 
 NAME	 =	philo
 

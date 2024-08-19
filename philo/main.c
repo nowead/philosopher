@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:49:06 by damin             #+#    #+#             */
-/*   Updated: 2024/08/15 15:01:40 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/19 22:10:37 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,16 +72,18 @@ int	init_philo(t_data *data, t_philo **philo)
 	i = 0;
 	while (i < data->num_of_philo)
 		data->forks[i++] = 0;
-	i = 0;
-	while (i < data->num_of_philo)
+	i = -1;
+	while (++i < data->num_of_philo)
 	{
 		(*philo)[i].id = i + 1;
 		(*philo)[i].num_of_eat = 0;
 		(*philo)[i].data = data;
-		i++;
 	}
 	if (mutex_init(data, philo))
+	{
+		free_all(*data, *philo);
 		return (err_return("Error: mutex init"));
+	}
 	return (0);
 }
 
@@ -91,15 +93,15 @@ int	main(int argc, char **argv)
 	t_philo	*philo;
 
 	if (argc < 5 || argc > 6)
-		return (err_return("Error: wrong number of arguments\n"));
+		return (err_return("Error: wrong number of arguments"));
 	if (parse_args(&data, argc, argv))
-		return (err_return("Error: wrong arguments\n"));
+		return (err_return("Error: wrong arguments"));
 	if (init_philo(&data, &philo))
-		return (err_return("Error: init_data\n"));
+		return (err_return("Error: init_data"));
 	if (start_simulation(&data, philo))
 	{
 		free_all(data, philo);
-		return (err_return("Error: start_simulation\n"));
+		return (err_return("Error: start_simulation"));
 	}
 	return (0);
 }

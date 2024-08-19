@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:48:56 by damin             #+#    #+#             */
-/*   Updated: 2024/08/19 15:31:36 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/19 22:07:36 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ int	child_process(t_philo *philo)
 			exit(1);
 		if (print_status(philo, "is thinking"))
 			exit(1);
-		fflush(stdout);// 지워야함
 	}
 	if (pthread_join(philo->death_checker, NULL))
 		err_exit("Error: pthread join failed");
@@ -63,7 +62,6 @@ int	parents_process(t_philo *philo, pid_t *pids)
 		}
 		i++;
 	}
-	sem_clear(philo);
 	return (ret);
 }
 
