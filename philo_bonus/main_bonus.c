@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:49:06 by damin             #+#    #+#             */
-/*   Updated: 2024/08/16 18:53:25 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/19 15:04:02 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,9 @@ void	sem_clear(t_philo *philo)
 	sem_close(philo->fork);
 	sem_close(philo->print);
 	sem_close(philo->die);
+	sem_unlink("sem_fork");
+	sem_unlink("sem_print");
+	sem_unlink("sem_die");
 }
 
 int	init_sem(t_philo *philo)

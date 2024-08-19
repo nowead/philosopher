@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 14:32:02 by damin             #+#    #+#             */
-/*   Updated: 2024/08/16 19:23:56 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/19 15:44:31 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,10 @@ typedef struct s_philo
 	pthread_t	death_checker;
 }					t_philo;
 
+// death_checker_bonus.c
+void	death_handle(t_philo *philo, long curr_time);
+void	*death_check(void *ptr);
+
 // main_bonus.c
 int		parse_args(t_philo *philo, int argc, char **argv);
 void	sem_clear(t_philo *philo);
@@ -48,16 +52,16 @@ int		init_philo(t_philo *philo);
 
 // philo_bonus.c
 int		print_status(t_philo *philo, char *status);
+void	pick_fork(t_philo *philo, int *ret);
+void	drop_fork(t_philo *philo, int *ret);
+void	philo_eat(t_philo *philo, int *ret);
 
 // simulation_bonus.c
-int		death_handle(t_philo *philo, long curr_time);
-void	*death_check(void *ptr);
 int		child_process(t_philo *philo);
-int		parents_process(t_philo *philo, pid_t *pid);
+int		parents_process(t_philo *philo, pid_t *pids);
+void	fork_err_handle(t_philo *philo, pid_t *pids, int err_i);
+int		repeat_fork(t_philo *philo, pid_t *pids, int i);
 int		start_simulation(t_philo *philo);
-
-// death_checker.c
-
 
 //philo_utils_bonus.c
 int		ft_atoi(const char *str);
