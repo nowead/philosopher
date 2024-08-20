@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:49:06 by damin             #+#    #+#             */
-/*   Updated: 2024/08/19 22:13:57 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/20 11:18:40 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int	parse_args(t_philo *philo, int argc, char **argv)
 		philo->num_of_eat = ft_atoi(argv[5]);
 	else
 		philo->num_of_eat = -1;
-	if (philo->num_of_philo < 2 || philo->time_to_die < 0 \
+	if (philo->num_of_philo < 1 || philo->time_to_die < 0 \
 	|| philo->time_to_eat < 0 || philo->time_to_sleep < 0 \
 	|| (argc == 6 && philo->num_of_eat < 0))
 		return (1);

@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:22:08 by damin             #+#    #+#             */
-/*   Updated: 2024/08/14 19:31:28 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/20 11:01:59 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ int	death_checker(t_data *data, t_philo	*philo)
 			pthread_mutex_lock(&data->stop_mutex);
 				philo->data->stop_simulation = 1;
 			pthread_mutex_unlock(&data->stop_mutex);
-		}	
+		}
 		if (data->stop_simulation)
 			break ;
 		i = 0;

@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 13:39:59 by damin             #+#    #+#             */
-/*   Updated: 2024/08/18 15:36:02 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/20 11:07:26 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,11 @@ int	pick_fork(t_philo *philo, int fork)
 	philo->data->forks[fork] = 1;
 	if (print_status(philo, "has taken a fork"))
 		return (1);
+	if (philo->data->num_of_philo == 1)
+	{
+		pthread_mutex_unlock(&philo->data->fork_mutex[fork]);
+		return (1);
+	}
 	return (0);
 }
 
