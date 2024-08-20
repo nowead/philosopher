@@ -6,7 +6,7 @@
 /*   By: damin <damin@student.42seoul.kr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/13 15:49:06 by damin             #+#    #+#             */
-/*   Updated: 2024/08/20 10:52:08 by damin            ###   ########.fr       */
+/*   Updated: 2024/08/20 14:31:45 by damin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,5 +103,6 @@ int	main(int argc, char **argv)
 		free_all(data, philo);
 		return (err_return("Error: start_simulation"));
 	}
+	free_all(data, philo);
 	return (0);
 }
